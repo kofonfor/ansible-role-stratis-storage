@@ -8,10 +8,10 @@
   service: name=stratisd state=started enabled=yes
 
 - name: create a pool
-  command: stratis pool create stratis_lab /dev/vdb
+  command: stratis pool create stratis_lab /dev/vdb # noqa 301
 
 - name: create an FS
-  command: stratis filesystem create stratis_lab data
+  command: stratis filesystem create stratis_lab data # noqa 301
 
 - name: create /data
   file: dest=/data state=directory

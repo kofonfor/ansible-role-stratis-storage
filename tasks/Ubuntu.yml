@@ -20,10 +20,12 @@
   unarchive: copy=no src="/root/stratisd-src-v1.0.3.tar.gz" dest=/root
 
 - name: install Rust
-  shell: curl https://sh.rustup.rs -sSf | sh -s -- -y
+  shell: curl https://sh.rustup.rs -sSf | sh -s -- -y # noqa 301 303 306
 
 - name: make stratisd
-  command: bash -c "cd /root/stratisd-1.0.3 && source $HOME/.cargo/env && make build" creates=/root/stratisd-1.0.3/target/x86_64-unknown-linux-gnu/debug/stratisd
+  command: bash -c "cd /root/stratisd-1.0.3 && source $HOME/.cargo/env && make build"
+  args:
+    creates: /root/stratisd-1.0.3/target/x86_64-unknown-linux-gnu/debug/stratisd
 
 - name: create /opt/stratisd/bin
   file: dest=/opt/stratisd/bin state=directory
