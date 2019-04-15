@@ -1,0 +1,60 @@
+- name: install prerequisites
+  apt: name={{ item }}
+  with_items:
+  - make
+  - gcc
+  - libssl-dev
+  - pkg-config
+  - libdbus-1-dev
+  - libudev-dev
+  - thin-provisioning-tools
+  - python3-pip
+  - python3-pyparsing
+  - libglib2.0-dev
+  - xfsprogs
+
+- name: get sources
+  get_url: url=https://github.com/stratis-storage/stratisd/archive/v1.0.3.tar.gz dest=/root/stratisd-src-v1.0.3.tar.gz
+
+- name: unpack sources
+  unarchive: copy=no src="/root/stratisd-src-v1.0.3.tar.gz" dest=/root
+
+- name: install Rust
+  shell: curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+- name: make stratisd
+  command: bash -c "cd /root/stratisd-1.0.3 && source $HOME/.cargo/env && make build" creates=/root/stratisd-1.0.3/target/x86_64-unknown-linux-gnu/debug/stratisd
+
+- name: create /opt/stratisd/bin
+  file: dest=/opt/stratisd/bin state=directory
+
+- name: copy stratisd to /opt/stratisd/bin/stratisd
+  copy: remote_src=yes src=/root/stratisd-1.0.3/target/x86_64-unknown-linux-gnu/debug/stratisd dest=/opt/stratisd/bin/stratisd mode=0755
+
+- name: put service description
+  template: src=stratisd.service dest=/etc/systemd/system/stratisd.service
+
+- name: install stratis-cli
+  pip: executable=pip3 name=git+https://github.com/stratis-storage/stratis-cli.git@v1.0.2
+
+- name: copy D-Bus service config
+  copy: remote_src=yes src=/root/stratisd-1.0.3/stratisd.conf dest=/usr/share/dbus-1/system.d/stratisd.conf
+
+- name: enable and start stratisd service
+  service: name=stratisd state=started enabled=yes
+
+- name: create a pool
+  command: stratis pool create {{ item.name }} {{ item.device }} creates=/stratis/{{ item.name }}
+  with_items: "{{ stratis_pools }}"
+
+- name: create an FS
+  command: stratis filesystem create {{ item.pool_name }} {{ item.name }} creates=/stratis/{{ item.pool_name }}/{{ item.name }}
+  with_items: "{{ stratis_filesystems }}"
+
+- name: create a mountpoint
+  file: dest={{ item.mountpoint }} state=directory
+  with_items: "{{ stratis_filesystems }}"
+
+- name: mount and modify /etc/fstab
+  mount: path={{ item.mountpoint }} src=/stratis/{{ item.pool_name }}/{{ item.name }} fstype=xfs state=mounted
+  with_items: "{{ stratis_filesystems }}"
