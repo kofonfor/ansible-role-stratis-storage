@@ -60,5 +60,5 @@
   with_items: "{{ stratis_filesystems }}"
 
 - name: mount and modify /etc/fstab
-  mount: path={{ item.mountpoint }} src=/stratis/{{ item.pool_name }}/{{ item.name }} fstype=xfs state=mounted
+  mount: path={{ item.mountpoint }} src=/stratis/{{ item.pool_name }}/{{ item.name }} fstype=xfs state=mounted opts={{ item.opts|default("defaults") }}
   with_items: "{{ stratis_filesystems }}"
