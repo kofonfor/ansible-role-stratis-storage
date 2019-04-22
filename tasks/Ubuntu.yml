@@ -12,6 +12,8 @@
   - python3-pyparsing
   - libglib2.0-dev
   - xfsprogs
+  - python3-setuptools
+  - python-setuptools
 
 - name: get sources
   get_url: url=https://github.com/stratis-storage/stratisd/archive/v1.0.3.tar.gz dest=/root/stratisd-src-v1.0.3.tar.gz
