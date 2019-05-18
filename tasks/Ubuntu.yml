@@ -16,33 +16,33 @@
   - python-setuptools
 
 - name: get sources
-  get_url: url=https://github.com/stratis-storage/stratisd/archive/v1.0.3.tar.gz dest=/root/stratisd-src-v1.0.3.tar.gz
+  get_url: url=https://github.com/stratis-storage/stratisd/archive/v1.0.4.tar.gz dest=/root/stratisd-src-v1.0.4.tar.gz
 
 - name: unpack sources
-  unarchive: copy=no src="/root/stratisd-src-v1.0.3.tar.gz" dest=/root
+  unarchive: copy=no src="/root/stratisd-src-v1.0.4.tar.gz" dest=/root
 
 - name: install Rust
   shell: curl https://sh.rustup.rs -sSf | sh -s -- -y # noqa 301 303 306
 
 - name: make stratisd
-  command: bash -c "cd /root/stratisd-1.0.3 && source $HOME/.cargo/env && make build"
+  command: bash -c "cd /root/stratisd-1.0.4 && source $HOME/.cargo/env && make build"
   args:
-    creates: /root/stratisd-1.0.3/target/x86_64-unknown-linux-gnu/debug/stratisd
+    creates: /root/stratisd-1.0.4/target/x86_64-unknown-linux-gnu/debug/stratisd
 
 - name: create /opt/stratisd/bin
   file: dest=/opt/stratisd/bin state=directory
 
 - name: copy stratisd to /opt/stratisd/bin/stratisd
-  copy: remote_src=yes src=/root/stratisd-1.0.3/target/x86_64-unknown-linux-gnu/debug/stratisd dest=/opt/stratisd/bin/stratisd mode=0755
+  copy: remote_src=yes src=/root/stratisd-1.0.4/target/x86_64-unknown-linux-gnu/debug/stratisd dest=/opt/stratisd/bin/stratisd mode=0755
 
 - name: put service description
   template: src=stratisd.service dest=/etc/systemd/system/stratisd.service
 
 - name: install stratis-cli
-  pip: executable=pip3 name=git+https://github.com/stratis-storage/stratis-cli.git@v1.0.2
+  pip: executable=pip3 name=git+https://github.com/stratis-storage/stratis-cli.git@v1.0.3
 
 - name: copy D-Bus service config
-  copy: remote_src=yes src=/root/stratisd-1.0.3/stratisd.conf dest=/usr/share/dbus-1/system.d/stratisd.conf
+  copy: remote_src=yes src=/root/stratisd-1.0.4/stratisd.conf dest=/usr/share/dbus-1/system.d/stratisd.conf
 
 - name: enable and start stratisd service
   service: name=stratisd state=started enabled=yes
