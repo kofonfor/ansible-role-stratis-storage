@@ -14,6 +14,8 @@
   - xfsprogs
   - python3-setuptools
   - python-setuptools
+  - curl
+  - git
 
 - name: get sources
   get_url: url=https://github.com/stratis-storage/stratisd/archive/v1.0.5.tar.gz dest=/root/stratisd-src-v1.0.5.tar.gz
