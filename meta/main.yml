@@ -1,0 +1,10 @@
+galaxy_info:
+  author: Kofonfor
+  description: Stratis Storage role
+  license: MIT
+  min_ansible_version: 2.0
+  platforms:
+  - name: Ubuntu
+    versions:
+      - xenial
+      - bionic
